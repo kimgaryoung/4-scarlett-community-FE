@@ -10,10 +10,7 @@ export const getServerUrl = () => {
         return configUrl.replace(/\/+$/, '');
     }
 
-    const host = window.location.hostname;
-    return host.includes('localhost')
-        ? 'http://localhost:3000'
-        : `http://${host}:3000`;
+    return window.location.origin;
 };
 
 export const resolveImageUrl = (url, fallback = null) => {
@@ -31,11 +28,18 @@ export const serverSessionCheck = async () => {
 };
 
 export const authCheck = async () => {
-    const HTTP_OK = 200;
-    const response = await serverSessionCheck();
-    if (!response || response.status !== HTTP_OK)
+    try {
+        const HTTP_OK = 200;
+        const response = await serverSessionCheck();
+        if (!response || response.status !== HTTP_OK) {
+            location.href = '/html/login.html';
+            return null;
+        }
+        return response;
+    } catch (e) {
         location.href = '/html/login.html';
-    return response;
+        return null;
+    }
 };
 
 export const authCheckReverse = async () => {
